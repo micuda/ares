@@ -4,13 +4,13 @@ namespace Micuda\Ares;
 
 use Micuda\Ares\Request;
 
-class Ares {
+class AresService {
 
     /** @var \Micuda\Ares\Request\IRequest */
     private $request;
     
     public function __construct(Request\IRequest $request = NULL) {
-        $this->request = is_null($request) ? new Request\BasicGetRequest(): $request;
+        $this->request = is_null($request) ? new Request\BasicGetRequest() : $request;
     }
 
     /**
