@@ -2,6 +2,10 @@
 
 namespace Micuda\Ares\Request;
 
+use GuzzleHttp;
+use Micuda\Ares;
+use Micuda\Ares\Exception;
+
 class BasicGetRequest implements IRequest {
 
     const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?ico=';
@@ -9,18 +13,24 @@ class BasicGetRequest implements IRequest {
     /** @var \Micuda\Ares\AresData */
     protected $data;
 
-    public function __construct(\Ares\AresData $data = NULL) {
-        $this->data = ($data === NULL) ? new \Micuda\Ares\AresData() : $data;
+    public function __construct(Ares\AresData $data = NULL) {
+        $this->data = ($data === NULL) ? new Ares\AresData() : $data;
     }
 
+   /**
+    * @param int $in
+    * @return \Micuda\Ares\AresData
+    * @throws \Micuda\Ares\Exception\InNotFoundException
+    */
     public function getData($in = NULL) {
-        return ($in === NULL) ? $this->data : $this->processXML($in);
+        return is_null($in) ? $this->data : $this->processXML($in);
     }
 
     /**
      * Process XML.
-     * @param type $in
+     * @param int $in
      * @return \Micuda\Ares\AresData
+     * @throws \Micuda\Ares\Exception\InNotFoundException
      */
     private function processXML($in) {
         $this->reset();
@@ -32,7 +42,7 @@ class BasicGetRequest implements IRequest {
         $vbas = $responceNode->VBAS;
 
         # get TIN
-        $tin = isset($vbas->DIC) ? $vbas->DIC : 'CZ' . $vbas->ICO;
+        $tin = isset($vbas->DIC) ? $vbas->DIC : 'CZ' . $vbas->ICO; // todo tohle opravit, ale zjisti co... =D
         
         # get street
         $street = (string) $vbas->AD->UC;
@@ -48,7 +58,7 @@ class BasicGetRequest implements IRequest {
                 ->setCompany($vbas->OF)
                 ->setStreet($street)
                 ->setZIP($vbas->AA->PSC)
-                ->setTown($vbas->AA->N)
+                ->setCity($vbas->AA->N)
                 ->setCountry($vbas->AA->NS);
 
         return $this->data;
@@ -58,17 +68,17 @@ class BasicGetRequest implements IRequest {
      * Loads the XML from ARES.
      * @param integer $in
      * @return \SimpleXMLElement
-     * @throws \Ares\Exception\InNotFoundException if IN not found
+     * @throws \Micuda\Ares\Exception\InNotFoundException if IN not found
      */
     private function loadXML($in) {
         return simplexml_load_string(self::XML);
 
-        $client = new \GuzzleHttp\Client();
+        $client = new GuzzleHttp\Client();
         $source = $client->request('GET', self::URL . (string) $in)->getBody();
         $xml = @simplexml_load_string($source);
 
         if (!$xml) {
-            throw new \Micuda\Ares\Exception\InNotFoundException();
+            throw new Exception\InNotFoundException();
         }
         return $xml;
     }

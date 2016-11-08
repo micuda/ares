@@ -1,21 +1,23 @@
 {
-    "name": "micuda/ares",
-    "type": "library",
-    "description": "",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Adam Mičuda",
-            "email": "adam.micuda@gmail.com",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "guzzlehttp/guzzle": "~6.1"
-    },
-    "autoload": {
-        "psr-0": {
-            "micuda\\ares": "src"
-        }
+  "name": "micuda/ares",
+  "type": "library",
+  "description": "",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Adam Mičuda",
+      "email": "adam.micuda@gmail.com",
+      "role": "Developer"
     }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "~6.1"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-0": {
+      "micuda\\ares": "src"
+    }
+  }
 }

@@ -2,14 +2,15 @@
 
 namespace Micuda\Ares;
 
+use Micuda\Ares\Request;
+
 class Ares {
-    use \Nette\SmartObject;
-    
+
     /** @var \Micuda\Ares\Request\IRequest */
     private $request;
     
-    public function __construct(\Micuda\Ares\Request\IRequest $request = NULL) {
-        $this->request = ($request === NULL) ? new \Micuda\Ares\Request\BasicGetRequest(): $request;
+    public function __construct(Request\IRequest $request = NULL) {
+        $this->request = is_null($request) ? new Request\BasicGetRequest(): $request;
     }
 
     /**

@@ -4,8 +4,6 @@ namespace Micuda\Ares;
 
 class AresData {
 
-    use \Nette\SmartObject;
-
     /*
      * nazev, adresa, IC, DIC
      */
@@ -32,8 +30,8 @@ class AresData {
         return $this->set('zip', $val);
     }
     
-    public function setTown($val) {
-        return $this->set('town', $val);
+    public function setCity($val) {
+        return $this->set('city', $val);
     }
     
     public function setCountry($val) {
