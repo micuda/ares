@@ -8,91 +8,91 @@ use Micuda\Ares\Exception;
 
 class BasicGetRequest implements IRequest {
 
-    const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?ico=';
+   const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?ico=';
 
-    /** @var \Micuda\Ares\AresData */
-    protected $data;
+   /** @var \Micuda\Ares\AresData */
+   protected $data;
 
-    public function __construct(Ares\AresData $data = NULL) {
-        $this->data = ($data === NULL) ? new Ares\AresData() : $data;
-    }
+   public function __construct(Ares\AresData $data = NULL) {
+      $this->data = is_null($data) ? new Ares\AresData() : $data;
+   }
 
    /**
     * @param int $in
     * @return \Micuda\Ares\AresData
     * @throws \Micuda\Ares\Exception\InNotFoundException
     */
-    public function getData($in = NULL) {
-        return is_null($in) ? $this->data : $this->processXML($in);
-    }
+   public function getData($in = NULL) {
+      return is_null($in) ? $this->data : $this->processXML($in);
+   }
 
-    /**
-     * Process XML.
-     * @param int $in
-     * @return \Micuda\Ares\AresData
-     * @throws \Micuda\Ares\Exception\InNotFoundException
-     */
-    private function processXML($in) {
-        $this->reset();
+   /**
+    * Process XML.
+    * @param int $in
+    * @return \Micuda\Ares\AresData
+    * @throws \Micuda\Ares\Exception\InNotFoundException
+    */
+   private function processXML($in) {
+      $this->reset();
 
-        $xml = $this->loadXML($in);
+      $xml = $this->loadXML($in);
 
-        $ns = $xml->getDocNamespaces();
-        $responceNode = $xml->children($ns['are'])->children($ns['D']);
-        $vbas = $responceNode->VBAS;
+      $ns = $xml->getDocNamespaces();
+      $responceNode = $xml->children($ns['are'])->children($ns['D']);
+      $vbas = $responceNode->VBAS;
 
-        # get TIN
-        $tin = isset($vbas->DIC) ? $vbas->DIC : 'CZ' . $vbas->ICO; // todo tohle opravit, ale zjisti co... =D
-        
-        # get street
-        $street = (string) $vbas->AD->UC;
-        if (is_numeric($street)) { # street is numeric -> prepend part of village name
-            $street = $vbas->AA->NCO . ' ' . $street;
-        }
-        if (isset($vbas->AA->CO)) { # if house number exists -> append it
-            $street .= '/' . $vbas->AA->CO;
-        }
+      # get TIN
+      $tin = isset($vbas->DIC) ? $vbas->DIC : 'CZ' . $vbas->ICO; // todo tohle opravit, ale zjisti co... =D
 
-        $this->data->setIN($vbas->ICO)
-                ->setTIN($tin)
-                ->setCompany($vbas->OF)
-                ->setStreet($street)
-                ->setZIP($vbas->AA->PSC)
-                ->setCity($vbas->AA->N)
-                ->setCountry($vbas->AA->NS);
+      # get street
+      $street = (string)$vbas->AD->UC;
+      if (is_numeric($street)) { # street is numeric -> prepend part of village name
+         $street = $vbas->AA->NCO . ' ' . $street;
+      }
+      if (isset($vbas->AA->CO)) { # if house number exists -> append it
+         $street .= '/' . $vbas->AA->CO;
+      }
 
-        return $this->data;
-    }
+      $this->data->setIn($vbas->ICO)
+                 ->setTin($tin)
+                 ->setCompany($vbas->OF)
+                 ->setStreet($street)
+                 ->setZip($vbas->AA->PSC)
+                 ->setCity($vbas->AA->N)
+                 ->setCountry($vbas->AA->NS);
 
-    /**
-     * Loads the XML from ARES.
-     * @param integer $in
-     * @return \SimpleXMLElement
-     * @throws \Micuda\Ares\Exception\InNotFoundException if IN not found
-     */
-    private function loadXML($in) {
-        return simplexml_load_string(self::XML);
+      return $this->data;
+   }
 
-        $client = new GuzzleHttp\Client();
-        $source = $client->request('GET', self::URL . (string) $in)->getBody();
-        $xml = @simplexml_load_string($source);
+   /**
+    * Loads the XML from ARES.
+    * @param integer $in
+    * @return \SimpleXMLElement
+    * @throws \Micuda\Ares\Exception\InNotFoundException if IN not found
+    */
+   private function loadXML($in) {
+      return simplexml_load_string(self::XML); // todo remove this when develop
 
-        if (!$xml) {
-            throw new Exception\InNotFoundException();
-        }
-        return $xml;
-    }
+      $client = new GuzzleHttp\Client();
+      $source = $client->request('GET', self::URL . (string)$in)->getBody();
+      $xml = @simplexml_load_string($source);
 
-    /**
-     * Resets data.
-     * @return self
-     */
-    public function reset() {
-        $this->data->reset();
-        return $this;
-    }
+      if (!$xml) {
+         throw new Exception\InNotFoundException();
+      }
+      return $xml;
+   }
 
-    const XML = '<?xml version="1.0" encoding="UTF-8"?>
+   /**
+    * Resets data.
+    * @return self
+    */
+   public function reset() {
+      $this->data->reset();
+      return $this;
+   }
+
+   const XML = '<?xml version="1.0" encoding="UTF-8"?>
 <are:Ares_odpovedi xmlns:are="http://wwwinfo.mfcr.cz/ares/xml_doc/schemas/ares/ares_answer_basic/v_1.0.3" xmlns:D="http://wwwinfo.mfcr.cz/ares/xml_doc/schemas/ares/ares_datatypes/v_1.0.3" xmlns:U="http://wwwinfo.mfcr.cz/ares/xml_doc/schemas/uvis_datatypes/v_1.0.3" odpoved_datum_cas="2016-07-30T15:23:47" odpoved_pocet="1" odpoved_typ="Basic" vystup_format="XML" xslt="klient" validation_XSLT="http://wwwinfo.mfcr.cz/ares/xml_doc/schemas/ares/ares_odpovedi.xsl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://wwwinfo.mfcr.cz/ares/xml_doc/schemas/ares/ares_answer_basic/v_1.0.3 http://wwwinfo.mfcr.cz/ares/xml_doc/schemas/ares/ares_answer_basic/v_1.0.3/ares_answer_basic_v_1.0.3.xsd" Id="ares">
 <are:Odpoved>
 <D:PID>0</D:PID>
