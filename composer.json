@@ -17,7 +17,7 @@
   },
   "autoload": {
     "psr-0": {
-      "micuda\\ares\\": "src/"
+      "Micuda\\Ares\\": "src/"
     }
   }
 }
