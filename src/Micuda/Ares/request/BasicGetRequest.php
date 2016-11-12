@@ -71,7 +71,7 @@ class BasicGetRequest implements IRequest {
     * @throws \Micuda\Ares\Exception\InNotFoundException if IN not found
     */
    private function loadXML($in) {
-      return simplexml_load_string(self::XML); // todo remove this when develop
+//      return simplexml_load_string(self::XML); // todo remove this when develop
 
       $client = new GuzzleHttp\Client();
       $source = $client->request('GET', self::URL . (string)$in)->getBody();
