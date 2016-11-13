@@ -42,7 +42,7 @@ class BasicGetRequest implements IRequest {
       $vbas = $responceNode->VBAS;
 
       # get TIN
-      $tin = isset($vbas->DIC) ? $vbas->DIC : 'CZ' . $vbas->ICO; // todo tohle opravit, ale zjisti co... =D
+      $tin = $vbas->DIC;
 
       # get street
       $street = (string)$vbas->AD->UC;
