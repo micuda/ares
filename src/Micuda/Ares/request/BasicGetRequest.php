@@ -45,21 +45,34 @@ class BasicGetRequest implements IRequest {
       $tin = $vbas->DIC;
 
       # get street
-      $street = (string)$vbas->AD->UC;
-      if (is_numeric($street)) { # street is numeric -> prepend part of village name
-         $street = $vbas->AA->NCO . ' ' . $street;
+      $street = (string)$vbas->AA->NU;
+      if (is_numeric($street)) { # street is numeric -> replace with part of village name
+         $street = $vbas->AA->NCO;
       }
-      if (isset($vbas->AA->CO)) { # if house number exists -> append it
+      /*if (isset($vbas->AA->CO)) { # if house number exists -> append it
          $street .= '/' . $vbas->AA->CO;
+      }*/
+
+      $buildingNumber = '';
+      if (isset($vbas->AA->CD)) {
+         $buildingNumber .= (string)$vbas->AA->CD; # cislo domovni
       }
+
+      if (isset($vbas->AA->CO)) {
+         $buildingNumber .= empty($buildingNumber) ? $vbas->AA->CO : '/' . $vbas->AA->CO; # cislo orientacni
+      }
+
+      $countryNumeric3Code = isset($vbas->AA->KS) ? $vbas->AA->KS : '';
 
       $this->data->setIn($vbas->ICO)
                  ->setTin($tin)
                  ->setCompany($vbas->OF)
                  ->setStreet($street)
-                 ->setZip($vbas->AA->PSC)
+                 ->setBuildingNumber($buildingNumber)
+                 ->setPostalCode($vbas->AA->PSC)
                  ->setCity($vbas->AA->N)
-                 ->setCountry($vbas->AA->NS);
+                 ->setCountry($vbas->AA->NS)
+                 ->setCountryNumeric3Code($countryNumeric3Code);
 
       return $this->data;
    }
@@ -71,7 +84,7 @@ class BasicGetRequest implements IRequest {
     * @throws \Micuda\Ares\Exception\InNotFoundException if IN not found
     */
    private function loadXML($in) {
-//      return simplexml_load_string(self::XML); // todo remove this when develop
+      //      return simplexml_load_string(self::XML); // todo remove this when develop
 
       $client = new GuzzleHttp\Client();
       $source = $client->request('GET', self::URL . (string)$in)->getBody();

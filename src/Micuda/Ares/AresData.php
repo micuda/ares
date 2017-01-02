@@ -10,9 +10,11 @@ use Nette\Utils;
  * @property string $tin
  * @property string $company
  * @property string $street
- * @property string $zip
+ * @property string $buildingNumber
+ * @property string $postalCode
  * @property string $city
  * @property string $country
+ * @property string $countryNumeric3Code
  */
 class AresData {
 
@@ -52,12 +54,20 @@ class AresData {
       return $this->set('street', $val);
    }
 
-   public function getZip() {
-      return $this->get('zip');
+   public function getBuildingNumber() {
+      return $this->get('buildingNumber');
    }
 
-   public function setZip($val) {
-      return $this->set('zip', $val);
+   public function setBuildingNumber($val) {
+      return $this->set('buildingNumber', $val);
+   }
+
+   public function getPostalCode() {
+      return $this->get('postalCode');
+   }
+
+   public function setPostalCode($val) {
+      return $this->set('postalCode', $val);
    }
 
    public function getCity() {
@@ -74,6 +84,14 @@ class AresData {
 
    public function setCountry($val) {
       return $this->set('country', $val);
+   }
+
+   public function getCountryNumeric3Code() {
+      return $this->get('countryNumeric3Code');
+   }
+
+   public function setCountryNumeric3Code($val) {
+      return $this->set('countryNumeric3Code', $val);
    }
 
    /**
