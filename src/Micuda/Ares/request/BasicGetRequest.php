@@ -90,8 +90,8 @@ class BasicGetRequest implements IRequest {
       $source = $client->request('GET', self::URL . (string)$in)->getBody();
       $xml = @simplexml_load_string($source);
 
-      if (!$xml) {
-         throw new Exception\InNotFoundException();
+      if (!$xml || !isset($xml->ICO)) {
+         throw new Exception\InNotFoundException($in);
       }
       return $xml;
    }
