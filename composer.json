@@ -17,6 +17,7 @@
   "autoload": {
     "psr-0": {
       "Micuda\\Ares\\": "src/"
-    }
+    },
+    "files": ["src/exception/Exception.php"]
   }
 }
