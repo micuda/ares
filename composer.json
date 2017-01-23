@@ -18,6 +18,6 @@
     "psr-0": {
       "Micuda\\Ares\\": "src/"
     },
-    "files": ["src/exception/Exception.php"]
+    "files": ["src/Micuda/Ares/exception/Exception.php"]
   }
 }
