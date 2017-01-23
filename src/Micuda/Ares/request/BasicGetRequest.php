@@ -35,43 +35,39 @@ class BasicGetRequest implements IRequest {
    private function processXML($in) {
       $this->reset();
 
-      $xml = $this->loadXML($in);
-
-      $ns = $xml->getDocNamespaces();
-      $responceNode = $xml->children($ns['are'])->children($ns['D']);
-      $vbas = $responceNode->VBAS;
+      $vbasEl = $this->loadXML($in);
 
       # get TIN
-      $tin = $vbas->DIC;
+      $tin = $vbasEl->DIC;
 
       # get street
-      $street = (string)$vbas->AA->NU;
+      $street = (string)$vbasEl->AA->NU;
       if (is_numeric($street)) { # street is numeric -> replace with part of village name
-         $street = $vbas->AA->NCO;
+         $street = $vbasEl->AA->NCO;
       }
-      /*if (isset($vbas->AA->CO)) { # if house number exists -> append it
-         $street .= '/' . $vbas->AA->CO;
+      /*if (isset($vbasEl->AA->CO)) { # if house number exists -> append it
+         $street .= '/' . $vbasEl->AA->CO;
       }*/
 
       $buildingNumber = '';
-      if (isset($vbas->AA->CD)) {
-         $buildingNumber .= (string)$vbas->AA->CD; # cislo domovni
+      if (isset($vbasEl->AA->CD)) {
+         $buildingNumber .= (string)$vbasEl->AA->CD; # cislo domovni
       }
 
-      if (isset($vbas->AA->CO)) {
-         $buildingNumber .= empty($buildingNumber) ? $vbas->AA->CO : '/' . $vbas->AA->CO; # cislo orientacni
+      if (isset($vbasEl->AA->CO)) {
+         $buildingNumber .= empty($buildingNumber) ? $vbasEl->AA->CO : '/' . $vbasEl->AA->CO; # cislo orientacni
       }
 
-      $countryNumeric3Code = isset($vbas->AA->KS) ? $vbas->AA->KS : '';
+      $countryNumeric3Code = isset($vbasEl->AA->KS) ? $vbasEl->AA->KS : '';
 
-      $this->data->setIn($vbas->ICO)
+      $this->data->setIn($vbasEl->ICO)
                  ->setTin($tin)
-                 ->setCompany($vbas->OF)
+                 ->setCompany($vbasEl->OF)
                  ->setStreet($street)
                  ->setBuildingNumber($buildingNumber)
-                 ->setPostalCode($vbas->AA->PSC)
-                 ->setCity($vbas->AA->N)
-                 ->setCountry($vbas->AA->NS)
+                 ->setPostalCode($vbasEl->AA->PSC)
+                 ->setCity($vbasEl->AA->N)
+                 ->setCountry($vbasEl->AA->NS)
                  ->setCountryNumeric3Code($countryNumeric3Code);
 
       return $this->data;
@@ -90,10 +86,13 @@ class BasicGetRequest implements IRequest {
       $source = $client->request('GET', self::URL . (string)$in)->getBody();
       $xml = @simplexml_load_string($source);
 
-      if (!$xml || !isset($xml->ICO)) {
+      $ns = $xml->getDocNamespaces();
+      $vbasEl = $xml->children($ns['are'])->children($ns['D'])->VBAS;
+
+      if (!$xml || !isset($vbasEl->ICO)) {
          throw new Exception\InNotFoundException($in);
       }
-      return $xml;
+      return $vbasEl;
    }
 
    /**
